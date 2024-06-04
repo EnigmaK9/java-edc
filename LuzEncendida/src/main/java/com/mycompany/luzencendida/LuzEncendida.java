@@ -11,7 +11,7 @@ package com.mycompany.luzencendida;
 public class LuzEncendida {
 
     public static void main(String[] args) {
-        boolean lightsOn = false;
-        System.out.println("are light on?: " + lightsOn);
+        boolean lightsOn = true;
+        System.out.println("are the lights on?: " + lightsOn);
     }
 }
