@@ -11,7 +11,7 @@ public class Pedido {
         boolean listoEnviar = false;
 
         if (costoArticulo > 24.00) {
-            System.out.println("¡El valor del artículo es alto!");
+            System.out.println("El valor del articulo es alto!");
         }
 
         if (listoEnviar) {
