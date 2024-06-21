@@ -14,7 +14,7 @@ public class CuentaBancariaSandy {
     /**
      * @param args the command line arguments
      */
-    
+
         public static void main(String[] args) throws InterruptedException {
         double saldo = 20000.99;
         double cantidadDepositada = 1000.00;
@@ -27,5 +27,5 @@ public class CuentaBancariaSandy {
         System.out.println("el saldo ahora tiene: " + saldo);
         //el saldo ahora tiene 19500.99
     }
-    
+
 }
