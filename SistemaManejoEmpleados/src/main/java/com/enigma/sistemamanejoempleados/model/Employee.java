@@ -1,4 +1,12 @@
-package com.example;
+/*
+ * -----------------------------------------------------------------------------
+ *  Author: Carlos Ignacio Padilla Herrera
+ *  Project: Employee Management System
+ *  Description: Model class representing an Employee entity.
+ * -----------------------------------------------------------------------------
+ */
+
+package com.enigma.sistemamanejoempleados.model;
 
 import java.time.LocalDate;
 
@@ -11,7 +19,7 @@ public class Employee {
     private LocalDate birthdate;
     private String gender;
 
-    // Getters and Setters
+    // Getters y Setters
     public int getId() {
         return id;
     }
