@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -188,9 +190,81 @@ class EmployeeDAO {
     }
 }
 
+// Clase LoginFrame para manejar la pantalla de inicio de sesión
+class LoginFrame extends JFrame {
+    private JTextField userField;
+    private JPasswordField passwordField;
+    private JButton loginButton;
+    private JLabel userLabel, passwordLabel;
+
+    public LoginFrame() {
+        setTitle("Login - Employee Management System");
+        setSize(400, 300);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        setLayout(new GridBagLayout());
+
+        userLabel = new JLabel("Username:");
+        passwordLabel = new JLabel("Password:");
+
+        userField = new JTextField(20);
+        passwordField = new JPasswordField(20);
+
+        loginButton = new JButton("Login");
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.insets = new Insets(10, 10, 10, 10);
+        add(userLabel, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        add(userField, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        add(passwordLabel, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        add(passwordField, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        add(loginButton, gbc);
+
+        loginButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String username = userField.getText();
+                String password = new String(passwordField.getPassword());
+
+                if (username.equals("admin") && password.equals("1234")) {
+                    // Credenciales correctas, mostrar ventana principal
+                    EventQueue.invokeLater(() -> {
+                        try {
+                            EmployeeManagementSystem window = new EmployeeManagementSystem();
+                            window.frame.setVisible(true);
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                    });
+                    dispose(); // Cerrar la ventana de login
+                } else {
+                    // Credenciales incorrectas, mostrar mensaje de error
+                    JOptionPane.showMessageDialog(LoginFrame.this, "Invalid username or password", "Login Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        setVisible(true);
+    }
+}
+
 // Clase Principal EmployeeManagementSystem
 public class EmployeeManagementSystem {
-    private JFrame frame;
+    JFrame frame;
     private JTextField idField, nameField, addressField, phoneField, emailField, birthdateField;
     private JComboBox<String> genderComboBox;
     private JButton insertButton, updateButton, deleteButton, selectButton, searchButton, languageButton;
@@ -367,19 +441,15 @@ public class EmployeeManagementSystem {
 
         updateButton.addActionListener(e -> {
             try {
-                if (!idField.getText().isEmpty() && isNumeric(idField.getText())) {
-                    Employee employee = employeeDAO.selectEmployeeById(Integer.parseInt(idField.getText()));
-                    if (employee != null) {
-                        fillFields(employee);
-                        resultArea.setText("Employee data loaded. You can now update the fields.");
-                    } else {
-                        resultArea.setText("Employee not found.");
-                    }
+                if (validateFields()) {
+                    updateEmployee();
+                    resultArea.setText("Employee Updated!");
+                    clearFields();
                 } else {
-                    resultArea.setText("Please enter a valid numeric ID.");
+                    resultArea.setText("Error: Invalid input data.");
                 }
-            } catch (NumberFormatException ex) {
-                resultArea.setText("Invalid ID format.");
+            } catch (DateTimeParseException ex) {
+                resultArea.setText("Error: Invalid date format. Use ddMMyyyy.");
             }
         });
 
@@ -589,8 +659,7 @@ public class EmployeeManagementSystem {
     public static void main(String[] args) {
         EventQueue.invokeLater(() -> {
             try {
-                EmployeeManagementSystem window = new EmployeeManagementSystem();
-                window.frame.setVisible(true);
+                new LoginFrame();
             } catch (Exception e) {
                 e.printStackTrace();
             }
