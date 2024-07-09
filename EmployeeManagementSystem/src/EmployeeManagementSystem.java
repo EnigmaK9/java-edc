@@ -9,6 +9,8 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 // Clase Employee
 class Employee {
@@ -198,41 +200,51 @@ class LoginFrame extends JFrame {
     private JLabel userLabel, passwordLabel;
 
     public LoginFrame() {
-        setTitle("Login - Employee Management System");
-        setSize(400, 300);
+        setTitle("Login - Employee Management System - Sistema de administración de empleados");
+        setSize(400, 200);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        setLayout(new GridBagLayout());
+        setLayout(new BorderLayout());
+
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBackground(new Color(240, 240, 240)); // Color de fondo
 
         userLabel = new JLabel("Username:");
+        userLabel.setForeground(new Color(46, 139, 87)); // Color de texto
         passwordLabel = new JLabel("Password:");
+        passwordLabel.setForeground(new Color(46, 139, 87)); // Color de texto
 
         userField = new JTextField(20);
         passwordField = new JPasswordField(20);
 
         loginButton = new JButton("Login");
+        loginButton.setBackground(new Color(46, 139, 87)); // Color de fondo del botón
+        loginButton.setForeground(Color.WHITE); // Color de texto del botón
+        loginButton.setPreferredSize(new Dimension(100, 30));
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.insets = new Insets(10, 10, 10, 10);
-        add(userLabel, gbc);
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.WEST;
+        panel.add(userLabel, gbc);
 
         gbc.gridx = 1;
-        gbc.gridy = 0;
-        add(userField, gbc);
+        panel.add(userField, gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 1;
-        add(passwordLabel, gbc);
+        panel.add(passwordLabel, gbc);
 
         gbc.gridx = 1;
-        gbc.gridy = 1;
-        add(passwordField, gbc);
+        panel.add(passwordField, gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 2;
-        add(loginButton, gbc);
+        gbc.anchor = GridBagConstraints.CENTER;
+        panel.add(loginButton, gbc);
+
+        add(panel, BorderLayout.CENTER);
 
         loginButton.addActionListener(new ActionListener() {
             @Override
@@ -260,7 +272,12 @@ class LoginFrame extends JFrame {
 
         setVisible(true);
     }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new LoginFrame());
+    }
 }
+
 
 // Clase Principal EmployeeManagementSystem
 public class EmployeeManagementSystem {
@@ -343,7 +360,7 @@ public class EmployeeManagementSystem {
         phoneField.setBounds(324, 204, 1236, 42); // Reducir el tamaño
         phoneField.setFont(font);
         frame.getContentPane().add(phoneField);
-        addInfoIcon(phoneField, "Enter phone number (example: 5255554321)");
+        addInfoIcon(phoneField, "Enter phone number (example: 525555432112)");
 
         emailLabel = new JLabel("Email:");
         emailLabel.setBounds(24, 264, 300, 42); // Reducir el tamaño
@@ -372,7 +389,7 @@ public class EmployeeManagementSystem {
         genderLabel.setFont(labelFont);
         frame.getContentPane().add(genderLabel);
 
-        genderComboBox = new JComboBox<>(new String[]{"Male", "Female"});
+        genderComboBox = new JComboBox<>(new String[]{"Male", "Female", "Other"});
         genderComboBox.setBounds(324, 384, 1236, 42); // Reducir el tamaño
         genderComboBox.setFont(font);
         frame.getContentPane().add(genderComboBox);
@@ -536,7 +553,7 @@ public class EmployeeManagementSystem {
     }
 
     private boolean isValidPhone(String str) {
-        return str.matches("\\d{10}");
+        return str.matches("\\d{12}");
     }
 
     private boolean isValidEmail(String str) {
