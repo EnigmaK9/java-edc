@@ -1,10 +1,11 @@
-import dao.EmployeeDAO;
-import models.Employee;
+package main.java;
+
+import main.java.views.LoginFrame;
+import main.java.dao.EmployeeDAO;
+import main.java.models.Employee;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -12,7 +13,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 public class EmployeeManagementSystem {
-    JFrame frame;
+    public JFrame frame;  // Cambiado a público
     private JTextField idField, nameField, addressField, phoneField, emailField, birthdateField;
     private JComboBox<String> genderComboBox;
     private JButton insertButton, updateButton, deleteButton, selectButton, searchButton, languageButton;
@@ -120,7 +121,7 @@ public class EmployeeManagementSystem {
         genderLabel.setFont(labelFont);
         frame.getContentPane().add(genderLabel);
 
-        genderComboBox = new JComboBox<>(new String[] { "Male", "Female", "Other" });
+        genderComboBox = new JComboBox<>(new String[]{"Male", "Female", "Other"});
         genderComboBox.setBounds(324, 384, 1236, 42); // Reducir el tamaño
         genderComboBox.setFont(font);
         frame.getContentPane().add(genderComboBox);
