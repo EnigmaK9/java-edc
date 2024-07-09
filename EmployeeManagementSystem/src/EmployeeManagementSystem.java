@@ -1,6 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -142,6 +141,29 @@ class EmployeeDAO {
         }
     }
 
+    public Employee selectEmployeeById(int id) {
+        String sql = "SELECT * FROM employees WHERE id=?";
+        try (Connection conn = DatabaseUtil.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                Employee employee = new Employee();
+                employee.setId(rs.getInt("id"));
+                employee.setName(rs.getString("name"));
+                employee.setAddress(rs.getString("address"));
+                employee.setPhone(rs.getString("phone"));
+                employee.setEmail(rs.getString("email"));
+                employee.setBirthdate(rs.getDate("birthdate").toLocalDate());
+                employee.setGender(rs.getString("gender"));
+                return employee;
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
     public List<Employee> selectAllEmployees() {
         List<Employee> employees = new ArrayList<>();
         String sql = "SELECT * FROM employees";
@@ -171,20 +193,10 @@ public class EmployeeManagementSystem {
     private JFrame frame;
     private JTextField idField, nameField, addressField, phoneField, emailField, birthdateField;
     private JComboBox<String> genderComboBox;
-    private JButton insertButton, updateButton, deleteButton, selectButton, languageButton;
+    private JButton insertButton, updateButton, deleteButton, selectButton, searchButton, languageButton;
     private JLabel idLabel, nameLabel, addressLabel, phoneLabel, emailLabel, birthdateLabel, genderLabel;
+    private JTextArea resultArea;
     private EmployeeDAO employeeDAO;
-
-    public static void main(String[] args) {
-        EventQueue.invokeLater(() -> {
-            try {
-                EmployeeManagementSystem window = new EmployeeManagementSystem();
-                window.frame.setVisible(true);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-    }
 
     public EmployeeManagementSystem() {
         employeeDAO = new EmployeeDAO();
@@ -317,13 +329,19 @@ public class EmployeeManagementSystem {
         selectButton.setFont(new Font("Roboto", Font.BOLD, 19));
         frame.getContentPane().add(selectButton);
 
+        searchButton = new JButton("Search");
+        searchButton.setBounds(780, 456, 144, 48); // Reducir el tamaño
+        searchButton.setBackground(new Color(173, 216, 230));
+        searchButton.setFont(new Font("Roboto", Font.BOLD, 19));
+        frame.getContentPane().add(searchButton);
+
         languageButton = new JButton("Español");
-        languageButton.setBounds(780, 456, 144, 48); // Reducir el tamaño
+        languageButton.setBounds(960, 456, 144, 48); // Reducir el tamaño
         languageButton.setFont(new Font("Roboto", Font.BOLD, 19));
         frame.getContentPane().add(languageButton);
 
         // Configurar área de resultados
-        JTextArea resultArea = new JTextArea();
+        resultArea = new JTextArea();
         resultArea.setFont(new Font("Monospaced", Font.PLAIN, 17)); // Reducir el tamaño de fuente
         resultArea.setBackground(new Color(255, 255, 204));
         resultArea.setBorder(BorderFactory.createLineBorder(Color.BLACK));
@@ -338,6 +356,7 @@ public class EmployeeManagementSystem {
                 if (validateFields()) {
                     insertEmployee();
                     resultArea.setText("Employee Inserted!");
+                    clearFields();
                 } else {
                     resultArea.setText("Error: Invalid input data.");
                 }
@@ -345,22 +364,31 @@ public class EmployeeManagementSystem {
                 resultArea.setText("Error: Invalid date format. Use ddMMyyyy.");
             }
         });
+
         updateButton.addActionListener(e -> {
             try {
-                if (validateFields()) {
-                    updateEmployee();
-                    resultArea.setText("Employee Updated!");
+                if (!idField.getText().isEmpty() && isNumeric(idField.getText())) {
+                    Employee employee = employeeDAO.selectEmployeeById(Integer.parseInt(idField.getText()));
+                    if (employee != null) {
+                        fillFields(employee);
+                        resultArea.setText("Employee data loaded. You can now update the fields.");
+                    } else {
+                        resultArea.setText("Employee not found.");
+                    }
                 } else {
-                    resultArea.setText("Error: Invalid input data.");
+                    resultArea.setText("Please enter a valid numeric ID.");
                 }
-            } catch (DateTimeParseException ex) {
-                resultArea.setText("Error: Invalid date format. Use ddMMyyyy.");
+            } catch (NumberFormatException ex) {
+                resultArea.setText("Invalid ID format.");
             }
         });
+
         deleteButton.addActionListener(e -> {
             deleteEmployee();
             resultArea.setText("Employee Deleted!");
+            clearFields();
         });
+
         selectButton.addActionListener(e -> {
             List<Employee> employees = selectEmployees();
             StringBuilder sb = new StringBuilder();
@@ -372,9 +400,25 @@ public class EmployeeManagementSystem {
             resultArea.setText(sb.toString());
         });
 
+        searchButton.addActionListener(e -> {
+            try {
+                if (!idField.getText().isEmpty() && isNumeric(idField.getText())) {
+                    Employee employee = employeeDAO.selectEmployeeById(Integer.parseInt(idField.getText()));
+                    if (employee != null) {
+                        fillFields(employee);
+                    } else {
+                        resultArea.setText("Employee not found.");
+                    }
+                } else {
+                    resultArea.setText("Please enter a valid numeric ID.");
+                }
+            } catch (NumberFormatException ex) {
+                resultArea.setText("Invalid ID format.");
+            }
+        });
+
         languageButton.addActionListener(e -> switchLanguage(languageButton));
 
-        frame.setExtendedState(JFrame.MAXIMIZED_BOTH); // Maximizar la ventana al iniciar
         frame.setVisible(true);
     }
 
@@ -443,6 +487,29 @@ public class EmployeeManagementSystem {
         }
     }
 
+    // Método para limpiar los campos de entrada y el área de resultados
+    private void clearFields() {
+        idField.setText("");
+        nameField.setText("");
+        addressField.setText("");
+        phoneField.setText("");
+        emailField.setText("");
+        birthdateField.setText("");
+        genderComboBox.setSelectedIndex(0);
+        resultArea.setText("");
+    }
+
+    // Método para rellenar los campos con los datos del empleado
+    private void fillFields(Employee employee) {
+        idField.setText(String.valueOf(employee.getId()));
+        nameField.setText(employee.getName());
+        addressField.setText(employee.getAddress());
+        phoneField.setText(employee.getPhone());
+        emailField.setText(employee.getEmail());
+        birthdateField.setText(employee.getBirthdate().format(DateTimeFormatter.ofPattern("ddMMyyyy")));
+        genderComboBox.setSelectedItem(employee.getGender());
+    }
+
     // Cambia el idioma de los componentes de la interfaz
     private void switchLanguage(JButton languageButton) {
         boolean isEnglish = languageButton.getText().equals("Español");
@@ -460,6 +527,7 @@ public class EmployeeManagementSystem {
             updateButton.setText("Actualizar");
             deleteButton.setText("Eliminar");
             selectButton.setText("Seleccionar");
+            searchButton.setText("Buscar");
         } else {
             languageButton.setText("Español");
             idLabel.setText("ID:");
@@ -473,6 +541,7 @@ public class EmployeeManagementSystem {
             updateButton.setText("Update");
             deleteButton.setText("Delete");
             selectButton.setText("Select");
+            searchButton.setText("Search");
         }
     }
 
@@ -516,17 +585,15 @@ public class EmployeeManagementSystem {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyyy");
         return LocalDate.parse(dateStr, formatter);
     }
-}
 
-/*
-TODO:
-1. Implementar funcionalidad de búsqueda de empleados por diferentes criterios.
-2. Mejorar el diseño de la interfaz gráfica (colores, fuentes, disposición).
-3. Incluir un sistema de login para acceso restringido.
-4. Permitir exportar e importar datos de empleados en diferentes formatos (CSV, Excel).
-5. Agregar gráficos y estadísticas sobre los empleados.
-6. Incluir un sistema de notificaciones para fechas importantes (cumpleaños, aniversarios).
-7. Añadir soporte para múltiples idiomas además de inglés y español.
-8. Integrar con un servicio de correo electrónico para enviar notificaciones.
-9. Permitir adjuntar archivos a los registros de empleados.
-*/
+    public static void main(String[] args) {
+        EventQueue.invokeLater(() -> {
+            try {
+                EmployeeManagementSystem window = new EmployeeManagementSystem();
+                window.frame.setVisible(true);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+}
