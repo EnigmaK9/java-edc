@@ -3,7 +3,9 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Enigm/Documents/repos/java-edc/proyectoFinal20250709/src/main/java/EmployeeManagementSystem.java</file>
+            <file>file:/C:/Users/Enigm/Documents/repos/java-edc/ProyectoFInal/src/main/java/views/EmployeeManagementFrame.java</file>
+            <file>file:/C:/Users/Enigm/Documents/repos/java-edc/ProyectoFInal/src/main/java/views/LoginFrame.java</file>
+            <file>file:/C:/Users/Enigm/Documents/repos/java-edc/ProyectoFInal/src/main/java/dao/EmployeeDAO.java</file>
         </group>
     </open-files>
 </project-private>
